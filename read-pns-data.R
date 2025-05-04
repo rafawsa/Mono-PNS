@@ -69,7 +69,7 @@ dfpns13 <-
     vars = var_pns_2013,
     labels = TRUE,
     design = FALSE)
-dfpns19 <-
+dfpns19 
   PNSIBGE::get_pns(
     year = 2019,
     selected = FALSE,
@@ -198,20 +198,83 @@ svy19 <-
 
 # C008 - Idade
 ## Agrupa idade ----
-svy13 <- 
-  svy13 |>  
-  srvyr::mutate(ageGroup = cut(C008,
-                               c(0, 25, 49, 74, 200),
-                               labels = c("g0-24", "g25-49",
-                                          "g50-74", "g75-older")))
-svy19 <- 
-  svy19 |> 
-  srvyr::mutate(ageGroup = cut(C008,
-                               c(0, 25, 49, 74, 200),
-                               labels = c("g0-24", "g25-49",
-                                          "g50-74", "g75-older")))
+# svy13 <- 
+#   svy13 |>  
+#   srvyr::mutate(ageGroup = cut(C008,
+#                                c(0, 25, 49, 74, 200),
+#                                labels = c("g0-24", "g25-49",
+#                                           "g50-74", "g75-older")))
+# svy19 <- 
+#   svy19 |> 
+#   srvyr::mutate(ageGroup = cut(C008,
+#                                c(0, 25, 49, 74, 200),
+#                                labels = c("g0-24", "g25-49",
+#                                           "g50-74", "g75-older")))
 
-
+# V0001
+## Agrupa por região ----
+svy13 <-
+  svy13 |>
+  srvyr::mutate(regiao = case_when(
+    V0001 == "Rondônia" ~ "Norte",
+    V0001 == "Acre"     ~ "Norte",
+    V0001 == "Amazonas" ~ "Norte",
+    V0001 == "Roraima"  ~ "Norte",
+    V0001 == "Pará"     ~ "Norte",
+    V0001 == "Amapá"    ~ "Norte",
+    V0001 == "Tocantins"~ "Norte",
+    V0001 == "Maranhão" ~ "Nordeste",
+    V0001 == "Piauí"    ~ "Nordeste",
+    V0001 == "Ceará"    ~ "Nordeste",
+    V0001 == "Rio Grande do Norte" ~ "Nordeste",
+    V0001 == "Paraíba"  ~ "Nordeste",
+    V0001 == "Pernambuco"~ "Nordeste",
+    V0001 == "Alagoas"  ~ "Nordeste",
+    V0001 == "Sergipe"  ~ "Nordeste",
+    V0001 == "Bahia"    ~ "Nordeste",
+    V0001 == "Minas Gerais" ~ "Sudeste",
+    V0001 == "Espírito Santo"~ "Sudeste",
+    V0001 == "Rio de Janeiro"~ "Sudeste",
+    V0001 == "São Paulo"     ~ "Sudeste",
+    V0001 == "Paraná"        ~ "Sul",
+    V0001 == "Santa Catarina"~ "Sul",
+    V0001 == "Rio Grande do Sul"~ "Sul",
+    V0001 == "Mato Grosso do Sul" ~ "Centro-Oeste",
+    V0001 == "Mato Grosso"        ~ "Centro-Oeste",
+    V0001 == "Goiás"              ~ "Centro-Oeste",
+    V0001 == "Distrito Federal"   ~ "Centro-Oeste",
+    TRUE ~ NA_character_))
+svy19 <-
+  svy19 |>
+  srvyr::mutate(regiao = case_when(
+    V0001 == "Rondônia" ~ "Norte",
+    V0001 == "Acre"     ~ "Norte",
+    V0001 == "Amazonas" ~ "Norte",
+    V0001 == "Roraima"  ~ "Norte",
+    V0001 == "Pará"     ~ "Norte",
+    V0001 == "Amapá"    ~ "Norte",
+    V0001 == "Tocantins"~ "Norte",
+    V0001 == "Maranhão" ~ "Nordeste",
+    V0001 == "Piauí"    ~ "Nordeste",
+    V0001 == "Ceará"    ~ "Nordeste",
+    V0001 == "Rio Grande do Norte" ~ "Nordeste",
+    V0001 == "Paraíba"  ~ "Nordeste",
+    V0001 == "Pernambuco"~ "Nordeste",
+    V0001 == "Alagoas"  ~ "Nordeste",
+    V0001 == "Sergipe"  ~ "Nordeste",
+    V0001 == "Bahia"    ~ "Nordeste",
+    V0001 == "Minas Gerais" ~ "Sudeste",
+    V0001 == "Espírito Santo"~ "Sudeste",
+    V0001 == "Rio de Janeiro"~ "Sudeste",
+    V0001 == "São Paulo"     ~ "Sudeste",
+    V0001 == "Paraná"        ~ "Sul",
+    V0001 == "Santa Catarina"~ "Sul",
+    V0001 == "Rio Grande do Sul"~ "Sul",
+    V0001 == "Mato Grosso do Sul" ~ "Centro-Oeste",
+    V0001 == "Mato Grosso"        ~ "Centro-Oeste",
+    V0001 == "Goiás"              ~ "Centro-Oeste",
+    V0001 == "Distrito Federal"   ~ "Centro-Oeste",
+    TRUE ~ NA_character_))
 
 
 
