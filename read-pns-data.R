@@ -69,7 +69,7 @@ dfpns13 <-
     vars = var_pns_2013,
     labels = TRUE,
     design = FALSE)
-dfpns19 
+dfpns19 <-
   PNSIBGE::get_pns(
     year = 2019,
     selected = FALSE,
