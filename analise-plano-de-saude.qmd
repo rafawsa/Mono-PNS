@@ -1,5 +1,5 @@
 ---
-title: "analise-instrucao"
+title: "analise-Plano-Saúde"
 author: "Rafawsa"
 format: html
 editor: visual
@@ -60,7 +60,7 @@ Vamos calcular a prevalência bruta da população com DCNT em relação à popu
 
 -   J011 - Consulta médica nos últimos 12 meses".
 
-#### Cenário 12 - Razão de prevalência do uso de serviços de saúde para a Exposição possuir ou não plano privado de saúde
+#### Cenário 12 - Razão de prevalência do uso de serviços de saúde para a Exposição possuir ou não plano de saúde privado
 
 ```{r}
 #| warning: false
@@ -73,13 +73,6 @@ c12_pns19_plano <-
   tibble(
     desfecho = c("J014", "J037", "J002", "J011")  # variáveis investigadas
   )
-
-```
-
-```{r}
-#| warning: false
-
-# Dados:
 
 ```
 
@@ -127,10 +120,10 @@ c12_pns19_plano <-
 #| warning: false
 # Resultados:
 
-# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Sem Instrução" e "Fundamental" para a população portadora de DCNT - PNS 2013
+# Cenário 12 - Razão de prevalência do uso de serviços de saúde para a Exposição possuir ou não plano de saúde privado - PNS 2013
 (c12_pns13_plano)
 
-# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Sem Instrução" e "Fundamental" para a população portadora de DCNT - PNS 2019
+# Cenário 12 - Razão de prevalência do uso de serviços de saúde para a Exposição possuir ou não plano de saúde privado - PNS 2019
 (c12_pns19_plano)
 
 ```
@@ -210,10 +203,10 @@ c13_pns19_dcnt <-
 #| warning: false
 # Resultados:
 
-# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Fundamental" e "Superior" para a população portadora de DCNT - PNS 2013
+# Cenário 13 - Razão de prevalência do uso de serviços de saúde para a Exposição possuir ou não Plano de Saúde Privado para a população portadora de DCNT - PNS 2013
 (c13_pns13_dcnt)
 
-# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Fundamental" e "Superior" para a população portadora de DCNT - PNS 2019
+# Cenário 13 - Razão de prevalência do uso de serviços de saúde para a Exposição possuir ou não Plano de Saúde Privado para a população portadora de DCNT - PNS 2019
 (c13_pns19_dcnt)
 
 ```
@@ -298,167 +291,3 @@ c14_pns19_no_dcnt <-
 (c14_pns19_no_dcnt)
 
 ```
-
-### Cenário 15 - Razão de prevalência do uso de serviços de saúde para a Exposição de ser portadora de DCNT para a população que possui plano de saúde privado.
-
-```{r}
-#| warning: false
-
-c15_pns13_dcnt <- 
-  tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
-  )
-c15_pns19_dcnt <- 
-  tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
-  )
-
-```
-
-```{r}
-#| warning: false
-
-c15_svy13_no_dcnt <- 
-  svy13 |> 
-    srvyr::filter(J007 == "Não")
-
-c14_svy19_no_dcnt <- 
-  svy19 |> 
-    srvyr::filter(J007 == "Não") 
-
-```
-
-```{r}
-#| warning: false
-# RP Bruta:
-c14_pns13_no_dcnt <- 
-  c14_pns13_no_dcnt |> 
-  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c14_svy13_no_dcnt, "I001", .,
-                                                  exp_pos = "Não", exp_neg = "Sim",
-                                                  des_pos = "Sim", des_neg = "Não"))) |>
-  unnest(rp_bruta) 
-
-c14_pns19_no_dcnt <- 
-  c14_pns19_no_dcnt |> 
-  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c14_svy19_no_dcnt, "I00101", .,
-                                                  exp_pos = "Não", exp_neg = "Sim",
-                                                  des_pos = "Sim", des_neg = "Não"))) |> 
-  unnest(rp_bruta) 
-
-```
-
-```{r}
-#| warning: false
-# RP Ajustada:
-c14_pns13_no_dcnt <- 
-  c14_pns13_no_dcnt |> 
-  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c14_svy13_no_dcnt, 
-                                                                "I001",.,
-                                                  exp_pos = "Não", exp_neg = "Sim",
-                                                  des_pos = "Sim", des_neg = "Não"))) |>
-  unnest(data)
-
-c14_pns19_no_dcnt <- 
-  c14_pns19_no_dcnt |> 
-  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c14_svy19_no_dcnt, 
-                                                                "I00101",.,
-                                                  exp_pos = "Não", exp_neg = "Sim",
-                                                  des_pos = "Sim", des_neg = "Não"))) |>
-  unnest(data)
-
-```
-
-```{r}
-#| warning: false
-# Resultados:
-
-# Cenário 14 - Razão de prevalência do uso de serviços de saúde para a Exposição de possuir ou não plano de saúde privado para a população Não portadora de DCNT - PNS 2013
-(c14_pns13_no_dcnt)
-
-# Cenário 14 - Razão de prevalência do uso de serviços de saúde para a Exposição de possuir ou não plano de saúde privado para a população Não portadora de DCNT - PNS 2019
-(c14_pns19_no_dcnt)
-
-```
-
-### Cenário 16 - Razão de prevalência do uso de serviços de saúde para a Exposição de ser portadora de DCNT para a população que possui plano de saúde privado.
-
-```{r}
-#| warning: false
-
-c15_pns13_no_dcnt <- 
-  tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
-  )
-c15_pns19_no_dcnt <- 
-  tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
-  )
-
-```
-
-```{r}
-#| warning: false
-
-c15_svy13_no_dcnt <- 
-  svy13 |> 
-    srvyr::filter(J007 == "Não")
-
-c14_svy19_no_dcnt <- 
-  svy19 |> 
-    srvyr::filter(J007 == "Não") 
-
-```
-
-```{r}
-#| warning: false
-# RP Bruta:
-c14_pns13_no_dcnt <- 
-  c14_pns13_no_dcnt |> 
-  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c14_svy13_no_dcnt, "I001", .,
-                                                  exp_pos = "Não", exp_neg = "Sim",
-                                                  des_pos = "Sim", des_neg = "Não"))) |>
-  unnest(rp_bruta) 
-
-c14_pns19_no_dcnt <- 
-  c14_pns19_no_dcnt |> 
-  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c14_svy19_no_dcnt, "I00101", .,
-                                                  exp_pos = "Não", exp_neg = "Sim",
-                                                  des_pos = "Sim", des_neg = "Não"))) |> 
-  unnest(rp_bruta) 
-
-```
-
-```{r}
-#| warning: false
-# RP Ajustada:
-c14_pns13_no_dcnt <- 
-  c14_pns13_no_dcnt |> 
-  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c14_svy13_no_dcnt, 
-                                                                "I001",.,
-                                                  exp_pos = "Não", exp_neg = "Sim",
-                                                  des_pos = "Sim", des_neg = "Não"))) |>
-  unnest(data)
-
-c14_pns19_no_dcnt <- 
-  c14_pns19_no_dcnt |> 
-  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c14_svy19_no_dcnt, 
-                                                                "I00101",.,
-                                                  exp_pos = "Não", exp_neg = "Sim",
-                                                  des_pos = "Sim", des_neg = "Não"))) |>
-  unnest(data)
-
-```
-
-```{r}
-#| warning: false
-# Resultados:
-
-# Cenário 14 - Razão de prevalência do uso de serviços de saúde para a Exposição de possuir ou não plano de saúde privado para a população Não portadora de DCNT - PNS 2013
-(c14_pns13_no_dcnt)
-
-# Cenário 14 - Razão de prevalência do uso de serviços de saúde para a Exposição de possuir ou não plano de saúde privado para a população Não portadora de DCNT - PNS 2019
-(c14_pns19_no_dcnt)
-
-```
-
-#### 
