@@ -9,7 +9,7 @@ params:
 
 ## Análise de uso de serviços de saúde por Região
 
-```{r}
+```{r label="bibliotecas R"}
 library(tidyverse) # utilizar a sintaxe tidyverse com o R
 library(survey)    # análise de pesquisas complexas
 library(srvyr)     # provê notação tidyverse para o pacote survey 
@@ -23,21 +23,21 @@ library(quarto)
 
 Para acessar os dados da PNS usaremos as funções do pacote PNSIBGE:
 
-```{r}
+```{r label = "read-pns-data.R"}
 #| warning: false
 
 source("read-pns-data.R")
 rm(var_pns_2013)
 rm(var_pns_2019)
-rm(dfpns13)
-rm(dfpns19)
+# rm(dfpns13)
+# rm(dfpns19)
 
 
 ```
 
 ### Razão de Prevalência Bruta e Ajustada (Poisson)
 
-```{r}
+```{r label="razao-prevalencia-bruta.R e ajustada"}
 #| warning: false
 
 source("razao-prevalencia-bruta.R")
@@ -59,7 +59,7 @@ Vamos calcular a prevalência bruta da população com DCNT em relação à popu
 
 #### Cenário 1 - Razão de prevalência do uso de serviços de saúde da população portadora em relação à população não portadora de DCNT - Região: `r params$regiao`.
 
-```{r}
+```{r label="cenário 1 a"}
 #| warning: false
 
 c1_pns13 <- 
@@ -73,7 +73,7 @@ c1_pns19 <-
 
 ```
 
-```{r}
+```{r label="cenário 1 b"}
 # Data:
 reg13 <- 
   svy13 |> 
@@ -84,7 +84,7 @@ reg19 <-
   
 ```
 
-```{r}
+```{r label="cenário 1 c"}
 #| warning: false
 # RP Bruta:
 c1_pns13 <- 
@@ -98,7 +98,7 @@ c1_pns19 <-
 
 ```
 
-```{r}
+```{r label="cenário 1 d"}
 #| warning: false
 # RP Ajustada
 c1_pns13 <- 
@@ -115,7 +115,7 @@ c1_pns19 <-
 
 #### Região: `r params$regiao`.
 
-```{r}
+```{r label="cenário 1 e"}
 #| warning: false
 # Resultados:
 
@@ -129,7 +129,7 @@ c1_pns19 <-
 
 ### Cenário 2 - Razão de prevalência do uso de serviços de saúde da população feminina portadora de DCNT em relação à população feminina não portadora de DCNT. Região: `r params$regiao`.
 
-```{r}
+```{r  label="cenário 2 a"}
 #| warning: false
 c2_pns13 <- 
   tibble(
@@ -142,7 +142,7 @@ c2_pns19 <-
 
 ```
 
-```{r}
+```{r label="cenário 2 b"}
 #| warning: false
 # Data:
 pop_fem13 <- 
@@ -158,7 +158,7 @@ pop_fem19 <-
 
 ```
 
-```{r}
+```{r label="cenário 2 c"}
 #| warning: false
 
 # RP Bruta:
@@ -175,7 +175,7 @@ c2_pns19 <-
 
 ```
 
-```{r}
+```{r  label="cenário 2 d"}
 #| warning: false
 # RP Ajustada:
 c2_pns13 <- 
@@ -191,7 +191,7 @@ c2_pns19 <-
 
 #### Resultados - Região: `r params$regiao`.
 
-```{r}
+```{r label="cenário 2 e"}
 #| warning: false
 # Resultados:
 
@@ -205,7 +205,7 @@ c2_pns19 <-
 
 ### Cenário 3 - Razão de prevalência do uso de serviços de saúde da população masculina portadora de DCNT em relação à população masculina não portadora de DCNT.
 
-```{r}
+```{r label="cenário 3 a"}
 #| warning: false
 c3_pns13 <- 
   tibble(
@@ -219,7 +219,7 @@ c3_pns19 <-
 
 ```
 
-```{r}
+```{r  label="cenário 3 b"}
 #| warning: false
 
 # Dados:
@@ -236,7 +236,7 @@ pop_masc19 <-
 
 ```
 
-```{r}
+```{r label="cenário 3 c"}
 #| warning: false
 # RP Bruta:
 c3_pns13 <- 
@@ -251,7 +251,7 @@ c3_pns19 <-
 
 ```
 
-```{r}
+```{r label="cenário 3 d"}
 #| warning: false
 # RP Ajustada:
 c3_pns13 <- 
@@ -268,7 +268,7 @@ c3_pns19 <-
 
 #### Resultados - Região `r params$regiao`.
 
-```{r}
+```{r label="cenário 3 e"}
 #| warning: false
 # Resultados:
 
@@ -282,7 +282,7 @@ c3_pns19 <-
 
 ### Cenário 4 - Razão de prevalência do uso de serviços de saúde, considerando a população feminina em relação à masculina para o subgrupo da população portadora de DCNT. Região `r params$regiao`.
 
-```{r}
+```{r label="cenário 4 a"}
 c4_pns13 <- 
   tibble(
     desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
@@ -294,7 +294,7 @@ c4_pns19 <-
 
 ```
 
-```{r}
+```{r  label="cenário 4 b"}
 # População:
 dcnt13 <- 
   svy13 |> 
@@ -309,7 +309,7 @@ dcnt19 <-
 
 ```
 
-```{r}
+```{r label="cenário 4 c"}
 # RP Bruta:
 c4_pns13 <- 
   c4_pns13 |> 
@@ -328,7 +328,7 @@ c4_pns19 <-
 
 ```
 
-```{r}
+```{r label="cenário 4 d"}
 # RP Ajustada
 c4_pns13 <- 
   c4_pns13 |> 
@@ -357,7 +357,7 @@ c4_pns19 <-
 
 #### Resultados - Região `r params$regiao`.
 
-```{r}
+```{r label="cenário 4 e"}
 #| warning: false
 # Resultados:
 # Cenário 4 - Razão de prevalência do uso de serviços de saúde, considerando a população feminina em relação à masculina para o subgrupo da população portadora de DCNT. PNS 2013.
