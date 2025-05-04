@@ -1,0 +1,433 @@
+---
+title: "Análise do Comportamento da População Brasileira Portadora de Doenças Crônicas Não Transmissíveis segundo as PNS 2013 e 2019"
+format: 
+  html:
+    number-sections: true
+    number-offset: 2
+    number-depth: 3
+editor: visual
+execute:
+  warning: false
+  error: false
+---
+
+### Análise de dados de pesquisa complexa utilizando os pacotes srvyr and survey do R
+
+```{r}
+#| warning: false
+
+# Bibliotecas ----
+library(tidyverse) # utilizar a sintaxe tidyverse com o R
+library(survey)    # análise de pesquisas complexas
+library(srvyr)     # provê notação tidyverse para o pacote survey 
+library(PNSIBGE)   # acesso aos dados da PNS
+library(broom)     # sumariza as informações dos modelos em formato tidy
+
+```
+
+### Acesso aos Dados da PNS 2013 e 2019
+
+Para acessar os dados da PNS usaremos as funções do pacote PNSIBGE:
+
+```{r}
+#| warning: false
+
+source("read-pns-data.R")
+rm(var_pns_2013)
+rm(var_pns_2019)
+rm(dfpns13)
+rm(dfpns19)
+
+
+```
+
+### Razão de Prevalência Bruta e Ajustada (Poisson)
+
+```{r}
+#| warning: false
+
+source("razao-prevalencia-bruta.R")
+source("razao-prevalencia-ajustada.R")
+
+```
+
+### Análise do comportamento da população portadora de DCNT em relação ao uso dos serviços de saúde
+
+#### Prevalência no uso de serviços de saúde da população com DCNT em relação à população sem DCNT
+
+Vamos calcular a prevalência bruta da população com DCNT em relação à população sem DCNT para as variáveis desfecho:
+
+-   J014 - Uso de serviços de saúde nas duas últimas semanas,
+
+-   J037 - Internação nos últimos 12 meses,
+
+-   J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde
+
+-   J011 - Consulta médica nos últimos 12 meses".
+
+### Cenário 1 - Razão de prevalência do uso de serviços de saúde da população portadora em relação à população não portadora de DCNT.
+
+```{r}
+#| warning: false
+
+c1_pns13 <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011")  # variáveis investigadas
+  )
+c1_pns19 <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011")  # variáveis investigadas
+  )
+
+```
+
+```{r}
+#| warning: false
+# RP Bruta:
+c1_pns13 <- 
+  c1_pns13 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(svy13, "J007", .))) |> 
+  unnest(rp_bruta) 
+c1_pns19 <- 
+  c1_pns19 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(svy19, "J007", .))) |> 
+  unnest(rp_bruta) 
+
+```
+
+```{r}
+#| warning: false
+# RP Ajustada
+c1_pns13 <- 
+  c1_pns13 |> 
+  mutate(data = map2("J007", desfecho, ~ calc_razao_prevalencia_ajustada(svy13, .x, .y))) |> 
+  unnest(data)
+c1_pns19 <- 
+  c1_pns19 |> 
+  mutate(data = map2("J007", desfecho, ~ calc_razao_prevalencia_ajustada(svy19, .x, .y))) |> 
+  unnest(data) 
+
+
+```
+
+```{r}
+#| warning: false
+# Resultados:
+
+# Cenário 1: Razão de prevalência do uso de serviços de saúde da população portadora em relação à população não portadora de DCNT - PNS 2013.
+(c1_pns13)
+
+# Cenário 1:  Razão de prevalência do uso de serviços de saúde da população portadora em relação à população não portadora de DCNT - PNS 2019.
+(c1_pns19)
+
+```
+
+### Cenário 2 - Razão de prevalência do uso de serviços de saúde da população feminina portadora de DCNT em relação à população feminina não portadora de DCNT.
+
+```{r}
+#| warning: false
+c2_pns13 <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+c2_pns19 <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+
+```
+
+```{r}
+#| warning: false
+# Data:
+pop_fem13 <- 
+  svy13 |> 
+  filter(C006 == "Feminino")
+pop_fem19 <- 
+  svy19 |> 
+  filter(C006 == "Mulher")
+
+```
+
+```{r}
+#| warning: false
+
+# RP Bruta:
+c2_pns13 <- 
+  c2_pns13 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(pop_fem13, "J007", .))) |> 
+  unnest(rp_bruta) 
+
+c2_pns19 <- 
+  c2_pns19 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(pop_fem19, "J007", .))) |> 
+  unnest(rp_bruta) 
+
+
+```
+
+```{r}
+#| warning: false
+# RP Ajustada:
+c2_pns13 <- 
+  c2_pns13 |> 
+  mutate(data = map2("J007", desfecho, ~ calc_razao_prevalencia_ajustada(pop_fem13, .x, .y))) |> 
+  unnest(data)
+c2_pns19 <- 
+  c2_pns19 |> 
+  mutate(data = map2("J007", desfecho, ~ calc_razao_prevalencia_ajustada(pop_fem19, .x, .y))) |> 
+  unnest(data) 
+
+```
+
+```{r}
+#| warning: false
+# Resultados:
+
+# Cenário 2: Razão de prevalência do uso de serviços de saúde da população feminina portadora de DCNT em relação à população feminina não portadora de DCNT. - PNS 2013
+(c2_pns13)
+
+# Cenário 2: Razão de prevalência do uso de serviços de saúde da população feminina portadora de DCNT em relação à população feminina não portadora de DCNT. - PNS 2019
+(c2_pns19)
+
+```
+
+### Cenário 3 - Razão de prevalência do uso de serviços de saúde da população masculina portadora de DCNT em relação à população masculina não portadora de DCNT.
+
+```{r}
+#| warning: false
+c3_pns13 <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+c3_pns19 <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+
+
+```
+
+```{r}
+#| warning: false
+
+# Dados:
+pop_masc13 <- 
+  svy13 |> 
+  srvyr::filter(C006 == "Masculino")
+pop_masc19 <- 
+  svy19 |> 
+  srvyr::filter(C006 == "Homem")
+
+```
+
+```{r}
+#| warning: false
+# RP Bruta:
+c3_pns13 <- 
+  c3_pns13 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(pop_masc13, "J007", .))) |> 
+  unnest(rp_bruta) 
+c3_pns19 <- 
+  c3_pns19 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(pop_masc19, "J007", .))) |> 
+  unnest(rp_bruta) 
+
+
+```
+
+```{r}
+#| warning: false
+# RP Ajustada:
+c3_pns13 <- 
+  c3_pns13 |> 
+  mutate(data = map2("J007", desfecho, ~ calc_razao_prevalencia_ajustada(pop_masc13, .x, .y))) |> 
+  unnest(data)
+
+c3_pns19 <- 
+  c3_pns19 |> 
+  mutate(data = map2("J007", desfecho, ~ calc_razao_prevalencia_ajustada(pop_masc19, .x, .y))) |> 
+  unnest(data) 
+
+```
+
+```{r}
+#| warning: false
+# Resultados:
+
+# Cenário 3 - Razão de prevalência do uso de serviços de saúde da população masculina portadora de DCNT em relação à população masculina não portadora de DCNT. PNS 2013
+(c3_pns13)
+
+# Cenário 3 - Razão de prevalência do uso de serviços de saúde da população masculina portadora de DCNT em relação à população masculina não portadora de DCNT. PNS 2019
+(c3_pns19)
+
+```
+
+### Cenário 4 - Razão de prevalência do uso de serviços de saúde, considerando a população feminina em relação à masculina para o subgrupo da população portadora de DCNT.
+
+```{r}
+c4_pns13 <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+c4_pns19 <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+
+```
+
+```{r}
+# População:
+dcnt13 <- 
+  svy13 |> 
+  srvyr::filter(J007 == "Sim")
+dcnt19 <- 
+  svy19 |> 
+  srvyr::filter(J007 == "Sim")
+
+```
+
+```{r}
+# RP Bruta:
+c4_pns13 <- 
+  c4_pns13 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(dcnt13, "C006", ., 
+                                                  exp_pos = "Feminino", 
+                                                  exp_neg = "Masculino",
+                                                  des_pos = "Sim", des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+c4_pns19 <- 
+  c4_pns19 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(dcnt19, "C006", .,
+                                                  exp_pos = "Mulher", exp_neg = "Homem",
+                                                  des_pos = "Sim", des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+```
+
+```{r}
+# RP Ajustada
+c4_pns13 <- 
+  c4_pns13 |> 
+  mutate(data = map2("C006", 
+                     desfecho, 
+                     ~ calc_razao_prevalencia_ajustada(dcnt13, .x, .y,
+                                                  exp_pos = "Feminino", 
+                                                  exp_neg = "Masculino",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(data)
+
+c4_pns19 <- 
+  c4_pns19 |> 
+  mutate(data = map2("C006", 
+                     desfecho, 
+                     ~ calc_razao_prevalencia_ajustada(dcnt19, .x, .y,
+                                                  exp_pos = "Mulher", 
+                                                  exp_neg = "Homem",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(data) 
+
+
+```
+
+```{r}
+#| warning: false
+# Resultados:
+# Cenário 4 - Razão de prevalência do uso de serviços de saúde, considerando a população feminina em relação à masculina para o subgrupo da população portadora de DCNT. PNS 2013.
+(c4_pns13)
+
+# Cenário 4 - Razão de prevalência do uso de serviços de saúde, considerando a população feminina em relação à masculina para o subgrupo da população portadora de DCNT. PNS 2019.
+(c4_pns19)
+
+```
+
+### Cenário 5 - Razão de prevalência do uso de serviços de saúde, considerando a população feminina em relação à masculina para o subgrupo da população não portadora de DCNT.
+
+```{r}
+#| warning: false
+c5_pns13 <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+c5_pns19 <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+
+
+```
+
+```{r}
+#| warning: false
+# Dados:
+not_dcnt13 <- 
+  svy13 |> 
+  filter(J007 == "Não")
+not_dcnt19 <- 
+  svy19 |> 
+  filter(J007 == "Não")
+
+```
+
+```{r}
+#| warning: false
+# RP Bruta:
+c5_pns13 <- 
+  c5_pns13 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(not_dcnt13, "C006", ., 
+                                                  exp_pos = "Feminino", exp_neg = "Masculino",
+                                                  des_pos = "Sim", des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+c5_pns19 <- 
+  c5_pns19 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(not_dcnt19, "C006", .,
+                                                  exp_pos = "Mulher", exp_neg = "Homem",
+                                                  des_pos = "Sim", des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+
+```
+
+```{r}
+#| warning: false
+# RP Ajustada:
+c5_pns13 <- 
+  c5_pns13 |> 
+  mutate(data = map2("C006", 
+                     desfecho, 
+                     ~ calc_razao_prevalencia_ajustada(not_dcnt13, .x, .y,
+                                                  exp_pos = "Feminino", 
+                                                  exp_neg = "Masculino",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(data)
+
+c5_pns19 <- 
+  c5_pns19 |> 
+  mutate(data = map2("C006", 
+                     desfecho, 
+                     ~ calc_razao_prevalencia_ajustada(not_dcnt19, .x, .y,
+                                                  exp_pos = "Mulher", 
+                                                  exp_neg = "Homem",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(data) 
+
+```
+
+```{r}
+#| warning: false
+# Resultados:
+
+# Cenário 5 - Razão de prevalência do uso de serviços de saúde, considerando a população feminina em relação à masculina para o subgrupo da população não portadora de DCNT. PNS 2013.
+(c5_pns13)
+
+# Cenário 5 - Razão de prevalência do uso de serviços de saúde, considerando a população feminina em relação à masculina para o subgrupo da população não portadora de DCNT. PNS 2019.
+(c5_pns19)
+
+```

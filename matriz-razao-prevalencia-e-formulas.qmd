@@ -1,0 +1,61 @@
+---
+title: "matriz-razao-prevalencia-bruta-e-formulas.qmd"
+author: "Rafael"
+format: html
+editor: visual
+---
+
+### Bibliotecas
+
+```{r}
+library(tidyverse)
+library(gt)
+library(gtExtras)
+```
+
+## Cálculo da Razão de Prevalência Bruta
+
+A razão de prevalência pode ser calculada através dos dados de uma tabela de contingência 2x2 [@wagner_medindo_1998].
+
+```{r}
+tbl_contingencia <- tibble(
+  lbs = c("Expostos", "Não Expostos", "Totais"),
+  desenvolveu_desfecho = c("A", "C", "A + C"),
+  nao_desenvolveu_desfecho = c("B", "D", "B + D"),
+  totais = c("A + B", "C + D", "N Total")
+)
+
+tbl_contingencia |> 
+  gt() |> 
+  cols_label(
+    lbs = md(" "),
+    desenvolveu_desfecho = md("Desenvolveu<br>desfecho"),
+    nao_desenvolveu_desfecho = md("Não desenvolveu<br>desfecho"),
+    totais = md("Totais")
+  ) |> 
+  gt_theme_pff() |> 
+  gt_highlight_cols(lbs, fill = "darkgray", alpha = 0.5) |> 
+  cols_align(
+    align = c("center"),
+    columns = everything()
+  ) |> 
+  cols_align(
+    align = c("right"),
+    columns = c(lbs)
+  ) 
+  
+```
+
+onde:
+
+$$
+Prevalência\;dos\;desfechos\;expostos = \frac{A}{A\;+\;B}
+$$
+
+e:
+
+$$
+Prevalência\;dos\;desfechos\;não\;expostos = \frac{C}{C\;+\;D}
+$$
+
+#### .

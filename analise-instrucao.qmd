@@ -1,0 +1,732 @@
+---
+title: "analise-instrucao"
+author: "Rafa"
+format: html
+editor: visual
+---
+
+## Análise de uso de serviços de saúde por grau de instrução
+
+```{r}
+#| warning: false
+
+# Bibliotecas ----
+library(tidyverse) # utilizar a sintaxe tidyverse com o R
+library(survey)    # análise de pesquisas complexas
+library(srvyr)     # provê notação tidyverse para o pacote survey 
+library(PNSIBGE)   # acesso aos dados da PNS
+library(broom)     # sumariza as informações dos modelos em formato tidy
+
+```
+
+### Acesso aos Dados da PNS 2013 e 2019
+
+Para acessar os dados da PNS usaremos as funções do pacote PNSIBGE:
+
+```{r}
+#| warning: false
+
+source("read-pns-data.R")
+rm(var_pns_2013)
+rm(var_pns_2019)
+rm(pns13)
+rm(pns19)
+rm(dfpns13)
+rm(dfpns19)
+
+
+```
+
+### Razão de Prevalência Bruta e Ajustada (Poisson)
+
+```{r}
+#| echo: false
+#| warning: false
+
+source("razao-prevalencia-bruta.R")
+source("razao-prevalencia-ajustada.R")
+
+```
+
+#### Prevalência no uso de serviços de saúde por grau de instrução
+
+Vamos calcular a prevalência bruta da população com DCNT em relação à população sem DCNT para as variáveis desfecho:
+
+-   J014 - Uso de serviços de saúde nas duas últimas semanas,
+
+-   J037 - Internação nos últimos 12 meses,
+
+-   J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde
+
+-   J011 - Consulta médica nos últimos 12 meses".
+
+#### Cenário 6 - Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Sem Instrução" e "Fundamental" para a população portadora de DCNT
+
+```{r}
+#| warning: false
+
+c6_pns13_dcnt <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011")  # variáveis investigadas
+  )
+c6_pns19_dcnt <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011")  # variáveis investigadas
+  )
+
+```
+
+```{r}
+#| warning: false
+
+# Dados:
+
+# VDD004A - Grau de Instrução:
+# "Superior Completo",
+# "Médio ou Superior Incompleto",
+# "Fundamental ou Médio Incompleto",
+# "Sem Instrução ou Fundamental incompleto"
+
+c6_svy13_dcnt <- 
+  svy13 |> 
+    srvyr::filter(J007 == "Sim") |> 
+    srvyr::filter(instrucao %in% c("Sem Instrução ou Fundamental incompleto",
+                                   "Superior Completo")) |> 
+  mutate(instrucao = factor(instrucao, levels = c("Superior Completo",
+                                                  "Sem Instrução ou Fundamental incompleto")),
+         instrucao = relevel(instrucao, ref = "Superior Completo"))
+
+c6_svy19_dcnt <- 
+  svy19 |> 
+    srvyr::filter(J007 == "Sim") |> 
+    srvyr::filter(instrucao %in% c("Sem Instrução ou Fundamental incompleto",
+                                   "Superior Completo")) |> 
+  mutate(instrucao = factor(instrucao, levels = c("Superior Completo",
+                                                  "Sem Instrução ou Fundamental incompleto")),
+         instrucao = relevel(instrucao, ref = "Superior Completo"))
+
+# svy13 |> srvyr::survey_count(instrucao)
+# c6_svy13 |> srvyr::survey_count(instrucao)
+
+```
+
+```{r}
+#| warning: false
+
+# RP Bruta:
+c6_pns13_dcnt <- 
+  c6_pns13_dcnt |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c6_svy13_dcnt,
+                                                  "instrucao", .x,
+                                                  exp_pos =  "Sem Instrução ou Fundamental incompleto",
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+c6_pns19_dcnt <- 
+  c6_pns19_dcnt |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c6_svy19_dcnt,
+                                                  "instrucao", .x,
+                                                  exp_pos =  "Sem Instrução ou Fundamental incompleto",
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+```
+
+```{r}
+#| warning: false
+# RP Ajustada
+c6_pns13_dcnt <- 
+  c6_pns13_dcnt |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c6_svy13_dcnt, "instrucao", .x,
+                                                  exp_pos = "Sem Instrução ou Fundamental incompleto", 
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", des_neg = "Não")))  |> 
+  unnest(data)
+
+c6_pns19_dcnt <- 
+  c6_pns19_dcnt |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c6_svy19_dcnt, "instrucao", .x,
+                                                  exp_pos = "Sem Instrução ou Fundamental incompleto", 
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", des_neg = "Não")))  |> 
+  unnest(data)
+
+
+```
+
+```{r}
+#| warning: false
+# Resultados:
+
+# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Sem Instrução" e "Fundamental" para a população portadora de DCNT - PNS 2013
+(c6_pns13_dcnt)
+
+# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Sem Instrução" e "Fundamental" para a população portadora de DCNT - PNS 2019
+(c6_pns19_dcnt)
+
+```
+
+### Cenário 7 - Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Fundamental" e "Superior" para a população portadora de DCNT
+
+```{r}
+#| warning: false
+
+c7_pns13_dcnt <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+c7_pns19_dcnt <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+
+```
+
+```{r}
+#| warning: false
+# Dados:
+
+# VDD004A - Grau de Instrução:
+# "Superior Completo",
+# "Médio ou Superior Incompleto",
+# "Fundamental ou Médio Incompleto",
+# "Sem Instrução ou Fundamental incompleto"
+
+c7_svy13_dcnt <- 
+  svy13 |> 
+    srvyr::filter(J007 == "Sim") |> 
+    srvyr::filter(instrucao %in% c("Fundamental ou Médio Incompleto",
+                                   "Superior Completo")) |> 
+  mutate(instrucao = factor(instrucao, levels = c("Superior Completo",
+                                                  "Fundamental ou Médio Incompleto")),
+         instrucao = relevel(instrucao, ref = "Superior Completo"))
+
+# svy13 |> srvyr::survey_count(instrucao)
+# c7_svy13_dcnt |> srvyr::survey_count(instrucao)
+
+c7_svy19_dcnt <- 
+  svy19 |> 
+    srvyr::filter(J007 == "Sim") |> 
+    srvyr::filter(instrucao %in% c("Fundamental ou Médio Incompleto",
+                                   "Superior Completo")) |> 
+  mutate(instrucao = factor(instrucao, levels = c("Superior Completo",
+                                                  "Fundamental ou Médio Incompleto")),
+         instrucao = relevel(instrucao, ref = "Superior Completo"))
+
+```
+
+```{r}
+#| warning: false
+# RP Bruta:
+c7_pns13_dcnt <- 
+  c7_pns13_dcnt |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c7_svy13_dcnt,
+                                                  "instrucao", .x,
+                                                  exp_pos = "Fundamental ou Médio Incompleto",
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+c7_pns19_dcnt <- 
+  c7_pns19_dcnt |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c7_svy19_dcnt, 
+                                                  "instrucao", .x,
+                                                  exp_pos = "Fundamental ou Médio Incompleto",
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+
+```
+
+```{r}
+#| warning: false
+# RP Ajustada:
+c7_pns13_dcnt <- 
+  c7_pns13_dcnt |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c7_svy13_dcnt, 
+                                                                "instrucao",.,
+                                                  exp_pos = "Fundamental ou Médio Incompleto",
+                                                  exp_neg = "Superior Completo", 
+                     
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |>
+  unnest(data)
+
+c7_pns19_dcnt <- 
+  c7_pns19_dcnt |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c7_svy19_dcnt, 
+                                                                "instrucao",.,
+                                                  exp_pos = "Fundamental ou Médio Incompleto",
+                                                  exp_neg = "Superior Completo", 
+                     
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |>
+  unnest(data)
+
+```
+
+```{r}
+#| warning: false
+# Resultados:
+
+# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Fundamental" e "Superior" para a população portadora de DCNT - PNS 2013
+(c7_pns13_dcnt)
+
+# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Fundamental" e "Superior" para a população portadora de DCNT - PNS 2019
+(c7_pns19_dcnt)
+
+```
+
+### Cenário 8 - Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Médio" e "Superior" para a população portadora de DCNT
+
+```{r}
+#| warning: false
+
+c8_pns13_dcnt <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+c8_pns19_dcnt <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+
+```
+
+```{r}
+#| warning: false
+# Dados:
+
+# VDD004A - Grau de Instrução:
+# "Superior Completo",
+# "Médio ou Superior Incompleto",
+# "Fundamental ou Médio Incompleto",
+# "Sem Instrução ou Fundamental incompleto"
+
+c8_svy13_dcnt <- 
+  svy13 |> 
+    srvyr::filter(J007 == "Sim") |> 
+    srvyr::filter(instrucao %in% c("Médio ou Superior Incompleto",
+                                   "Superior Completo")) |> 
+  mutate(instrucao = factor(instrucao, levels = c("Superior Completo",
+                                                  "Médio ou Superior Incompleto")),
+         instrucao = relevel(instrucao, ref = "Superior Completo"))
+
+# svy13 |> srvyr::survey_count(instrucao)
+# c8_svy13_dcnt |> srvyr::survey_count(instrucao)
+
+c8_svy19_dcnt <- 
+  svy19 |> 
+    srvyr::filter(J007 == "Sim") |> 
+    srvyr::filter(instrucao %in% c("Médio ou Superior Incompleto",
+                                   "Superior Completo")) |> 
+  mutate(instrucao = factor(instrucao, levels = c("Superior Completo",
+                                                  "Médio ou Superior Incompleto")),
+         instrucao = relevel(instrucao, ref = "Superior Completo"))
+
+```
+
+```{r}
+#| warning: false
+# RP Bruta:
+c8_pns13_dcnt <- 
+  c8_pns13_dcnt |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c8_svy13_dcnt,
+                                                  "instrucao", .x,
+                                                  exp_pos = "Médio ou Superior Incompleto",
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |>  
+  unnest(rp_bruta) 
+
+c8_pns19_dcnt <- 
+  c8_pns19_dcnt |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c8_svy19_dcnt,
+                                                  "instrucao", .x,
+                                                  exp_pos = "Médio ou Superior Incompleto",
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+
+```
+
+```{r}
+#| warning: false
+# RP Ajustada:
+c8_pns13_dcnt <- 
+  c8_pns13_dcnt |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c8_svy13_dcnt, 
+                                                                "instrucao",.,
+                                                  exp_pos = "Médio ou Superior Incompleto",
+                                                  exp_neg = "Superior Completo", 
+                     
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |>
+  unnest(data)
+
+c8_pns19_dcnt <- 
+  c8_pns19_dcnt |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c8_svy19_dcnt, 
+                                                                "instrucao",.,
+                                                  exp_pos = "Médio ou Superior Incompleto",
+                                                  exp_neg = "Superior Completo", 
+                     
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |>
+  unnest(data)
+
+```
+
+```{r}
+#| warning: false
+# Resultados:
+
+# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Médio" e "Superior" para a população portadora de DCNT - PNS 2013
+(c8_pns13_dcnt)
+
+# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Médio" e "Superior" para a população portadora de DCNT - PNS 2019
+(c8_pns19_dcnt)
+
+```
+
+#### Cenário 9 - Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Sem Instrução" e "Superior" para a população NÃO portadora de DCNT
+
+```{r}
+#| warning: false
+
+c9_pns13_no_dcnt <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011")  # variáveis investigadas
+  )
+c9_pns19_no_dcnt <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011")  # variáveis investigadas
+  )
+
+```
+
+```{r}
+#| warning: false
+
+# Dados:
+
+# VDD004A - Grau de Instrução:
+# "Superior Completo",
+# "Médio ou Superior Incompleto",
+# "Fundamental ou Médio Incompleto",
+# "Sem Instrução ou Fundamental incompleto"
+
+c9_svy13_no_dcnt <- 
+  svy13 |> 
+    srvyr::filter(J007 == "Não") |> 
+    srvyr::filter(instrucao %in% c("Sem Instrução ou Fundamental incompleto",
+                                   "Superior Completo")) |> 
+  mutate(instrucao = factor(instrucao, levels = c("Superior Completo",
+                                                  "Sem Instrução ou Fundamental incompleto")),
+         instrucao = relevel(instrucao, ref = "Superior Completo"))
+
+c9_svy19_no_dcnt <- 
+  svy19 |> 
+    srvyr::filter(J007 == "Não") |> 
+    srvyr::filter(instrucao %in% c("Sem Instrução ou Fundamental incompleto",
+                                   "Superior Completo")) |> 
+  mutate(instrucao = factor(instrucao, levels = c("Superior Completo",
+                                                  "Sem Instrução ou Fundamental incompleto")),
+         instrucao = relevel(instrucao, ref = "Superior Completo"))
+
+# svy13 |> srvyr::survey_count(instrucao)
+# c6_svy13 |> srvyr::survey_count(instrucao)
+
+```
+
+```{r}
+#| warning: false
+
+# RP Bruta:
+c9_pns13_no_dcnt <- 
+  c9_pns13_no_dcnt |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c9_svy13_no_dcnt,
+                                                  "instrucao", .x,
+                                                  exp_pos = "Sem Instrução ou Fundamental incompleto", 
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+c9_pns19_no_dcnt <- 
+  c9_pns19_no_dcnt |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c9_svy19_no_dcnt,
+                                                  "instrucao", .x,
+                                                  exp_pos = "Sem Instrução ou Fundamental incompleto", 
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+```
+
+```{r}
+#| warning: false
+# RP Ajustada
+c9_pns13_no_dcnt <- 
+  c9_pns13_no_dcnt |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c9_svy13_no_dcnt, "instrucao", .x,
+                                                  exp_pos = "Sem Instrução ou Fundamental incompleto", 
+                                                  exp_neg = "Superior Completo",
+                     
+                                                  des_pos = "Sim", des_neg = "Não")))  |> 
+  unnest(data)
+
+c9_pns19_no_dcnt <- 
+  c9_pns19_no_dcnt |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c9_svy19_no_dcnt, "instrucao", .x,
+                                                  exp_pos = "Sem Instrução ou Fundamental incompleto", 
+                                                  exp_neg = "Superior Completo",
+                     
+                                                  des_pos = "Sim", des_neg = "Não")))  |> 
+  unnest(data)
+
+
+```
+
+```{r}
+#| warning: false
+# Resultados:
+
+# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Sem Instrução" e "Superior" para a população NÃO portadora de DCNT - PNS 2013
+(c9_pns13_no_dcnt)
+
+# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Sem Instrução" e "Superior" para a população NÃO portadora de DCNT - PNS 2019
+(c9_pns19_no_dcnt)
+
+```
+
+### Cenário 10 - Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Fundamental" e "Superior" para a população NÃO portadora de DCNT
+
+```{r}
+#| warning: false
+
+c10_pns13_no_dcnt <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+c10_pns19_no_dcnt <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+
+```
+
+```{r}
+#| warning: false
+# Dados:
+
+# VDD004A - Grau de Instrução:
+# "Superior Completo",
+# "Médio ou Superior Incompleto",
+# "Fundamental ou Médio Incompleto",
+# "Sem Instrução ou Fundamental incompleto"
+
+c10_svy13_no_dcnt <- 
+  svy13 |> 
+    srvyr::filter(J007 == "Não") |> 
+    srvyr::filter(instrucao %in% c("Fundamental ou Médio Incompleto",
+                                   "Superior Completo")) |> 
+  mutate(instrucao = factor(instrucao, levels = c("Superior Completo",
+                                                  "Fundamental ou Médio Incompleto")),
+         instrucao = relevel(instrucao, ref = "Superior Completo"))
+
+# svy13 |> srvyr::survey_count(instrucao)
+# c7_svy13_dcnt |> srvyr::survey_count(instrucao)
+
+c10_svy19_no_dcnt <- 
+  svy19 |> 
+    srvyr::filter(J007 == "Não") |> 
+    srvyr::filter(instrucao %in% c("Fundamental ou Médio Incompleto",
+                                   "Superior Completo")) |> 
+  mutate(instrucao = factor(instrucao, levels = c("Superior Completo",
+                                                  "Fundamental ou Médio Incompleto")),
+         instrucao = relevel(instrucao, ref = "Superior Completo"))
+
+```
+
+```{r}
+#| warning: false
+# RP Bruta:
+c10_pns13_no_dcnt <- 
+  c10_pns13_no_dcnt |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c10_svy13_no_dcnt, "instrucao", .,
+                                                  exp_pos = "Fundamental ou Médio Incompleto", 
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+c10_pns19_no_dcnt <- 
+  c10_pns19_no_dcnt |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c10_svy19_no_dcnt, "instrucao", .,
+                                                  exp_pos = "Fundamental ou Médio Incompleto", 
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+
+```
+
+```{r}
+#| warning: false
+# RP Ajustada:
+c10_pns13_no_dcnt <- 
+  c10_pns13_no_dcnt |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c10_svy13_no_dcnt, 
+                                                                "instrucao",.,
+                                                  exp_pos = "Fundamental ou Médio Incompleto",
+                                                  exp_neg = "Superior Completo", 
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |>
+  unnest(data)
+
+c10_pns19_no_dcnt <- 
+  c10_pns19_no_dcnt |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c10_svy19_no_dcnt, 
+                                                                "instrucao",.,
+                                                  exp_pos = "Fundamental ou Médio Incompleto",
+                                                  exp_neg = "Superior Completo", 
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |>
+  unnest(data)
+
+```
+
+```{r}
+#| warning: false
+# Resultados:
+
+# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Fundamental" e "Superior" para a população NÃO portadora de DCNT - PNS 2013
+(c10_pns13_no_dcnt)
+
+# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Fundamental" e "Superior" para a população NÃO portadora de DCNT - PNS 2019
+(c10_pns19_no_dcnt)
+
+```
+
+### Cenário 11 - Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Médio" e "Superior" para a população Não portadora de DCNT
+
+```{r}
+#| warning: false
+
+c11_pns13_no_dcnt <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+c11_pns19_no_dcnt <- 
+  tibble(
+    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+  )
+
+```
+
+```{r}
+#| warning: false
+# Dados:
+
+# VDD004A - Grau de Instrução:
+# "Superior Completo",
+# "Médio ou Superior Incompleto",
+# "Fundamental ou Médio Incompleto",
+# "Sem Instrução ou Fundamental incompleto"
+
+c11_svy13_no_dcnt <- 
+  svy13 |> 
+    srvyr::filter(J007 == "Não") |> 
+    srvyr::filter(instrucao %in% c("Médio ou Superior Incompleto",
+                                   "Superior Completo")) |> 
+  mutate(instrucao = factor(instrucao, levels = c("Superior Completo",
+                                                  "Médio ou Superior Incompleto")),
+         instrucao = relevel(instrucao, ref = "Superior Completo"))
+
+# svy13 |> srvyr::survey_count(instrucao)
+# c8_svy13_dcnt |> srvyr::survey_count(instrucao)
+
+c11_svy19_no_dcnt <- 
+  svy19 |> 
+    srvyr::filter(J007 == "Não") |> 
+    srvyr::filter(instrucao %in% c("Médio ou Superior Incompleto",
+                                   "Superior Completo")) |> 
+  mutate(instrucao = factor(instrucao, levels = c("Superior Completo",
+                                                  "Médio ou Superior Incompleto")),
+         instrucao = relevel(instrucao, ref = "Superior Completo"))
+
+```
+
+```{r}
+#| warning: false
+# RP Bruta:
+c11_pns13_no_dcnt <- 
+  c11_pns13_no_dcnt |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c11_svy13_no_dcnt, 
+                                                  "instrucao", .,
+                                                  exp_pos = "Médio ou Superior Incompleto", 
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |> 
+  unnest(rp_bruta) 
+
+c11_pns19_no_dcnt <- 
+  c11_pns19_no_dcnt |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c11_svy19_no_dcnt, "instrucao", .,
+                                                  exp_pos = "Médio ou Superior Incompleto", 
+                                                  exp_neg = "Superior Completo",
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |>  
+  unnest(rp_bruta) 
+
+
+```
+
+```{r}
+#| warning: false
+# RP Ajustada:
+c11_pns13_no_dcnt <- 
+  c11_pns13_no_dcnt |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c11_svy13_no_dcnt, 
+                                                                "instrucao",.,
+                                                  exp_pos = "Médio ou Superior Incompleto",
+                                                  exp_neg = "Superior Completo", 
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |>
+  unnest(data)
+
+c11_pns19_no_dcnt <- 
+  c11_pns19_no_dcnt |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c11_svy19_no_dcnt, 
+                                                                "instrucao",.,
+                                                  exp_pos = "Médio ou Superior Incompleto",
+                                                  exp_neg = "Superior Completo", 
+                                                  des_pos = "Sim", 
+                                                  des_neg = "Não"))) |>
+  unnest(data)
+
+```
+
+```{r}
+#| warning: false
+# Resultados:
+
+# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Médio" e "Superior" para a população NÃO portadora de DCNT - PNS 2013
+(c11_pns13_no_dcnt)
+
+# Razão de prevalência do uso de serviços de saúde para a Exposição do grau de instrução "Médio" e "Superior" para a população portadora de DCNT - PNS 2019
+(c11_pns19_no_dcnt)
+
+```
