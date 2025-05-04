@@ -61,22 +61,22 @@ pns19 <-
 
 ## Os dados sem pesos permite obter informações 
 ## sobre __labels__ e __levels__.
-dfpns13 <-
-  PNSIBGE::get_pns(
-    year = 2013,
-    selected = FALSE,
-    anthropometry = FALSE,
-    vars = var_pns_2013,
-    labels = TRUE,
-    design = FALSE)
-dfpns19 <-
-  PNSIBGE::get_pns(
-    year = 2019,
-    selected = FALSE,
-    anthropometry = FALSE,
-    vars = var_pns_2019,
-    labels = TRUE,
-    design = FALSE)
+# dfpns13 <-
+#   PNSIBGE::get_pns(
+#     year = 2013,
+#     selected = FALSE,
+#     anthropometry = FALSE,
+#     vars = var_pns_2013,
+#     labels = TRUE,
+#     design = FALSE)
+# dfpns19 <-
+#   PNSIBGE::get_pns(
+#     year = 2019,
+#     selected = FALSE,
+#     anthropometry = FALSE,
+#     vars = var_pns_2019,
+#     labels = TRUE,
+#     design = FALSE)
 
 # tbl-svy ---- 
 # O pacote srvyr trabalha com o objeto tbl.svy 
@@ -92,9 +92,9 @@ svy19 <- srvyr::as_survey(pns19)
 ### Ajustar o "level" de J007 ----
 ### para que os cálculos considerem
 ### portadores em referência a não portadores de DCNT
-levels(dfpns13$J007)
-levels(dfpns19$J007) # dados de 2019 contém "Ignorado" 
-dfpns19 |> count(J007) # Não há registros com valor "Ignorado"
+# levels(dfpns13$J007)
+# levels(dfpns19$J007) # dados de 2019 contém "Ignorado" 
+# dfpns19 |> count(J007) # Não há registros com valor "Ignorado"
 svy13 <- 
   svy13 |> 
   srvyr::mutate(J007 = relevel(J007, ref = "Não")) 
@@ -106,23 +106,23 @@ svy19 <-
     J007 = relevel(J007, ref = "Não")) 
 
 # J014 - Usou serviço de saúde nas últimas 2 semanas
-levels(dfpns13$J014)
-levels(dfpns19$J014) # dados de 2019 contém "Ignorado" 
-dfpns19 |> count(J014) # Não há registros com valor "Ignorado"
+# levels(dfpns13$J014)
+# levels(dfpns19$J014) # dados de 2019 contém "Ignorado" 
+# dfpns19 |> count(J014) # Não há registros com valor "Ignorado"
 
 # J037 - Teve internação nos últimos 12 meses
-levels(dfpns13$J037)
-levels(dfpns19$J037) # dados de 2019 contém "Ignorado" 
-dfpns19 |> count(J037) # Não há registros com valor "Ignorado"
+# levels(dfpns13$J037)
+# levels(dfpns19$J037) # dados de 2019 contém "Ignorado" 
+# dfpns19 |> count(J037) # Não há registros com valor "Ignorado"
 
 # J002 - Deixou de realizar atividades nas 2 últimas semanas por motivo de saúde
-levels(dfpns13$J002)
-levels(dfpns19$J002) # dados de 2019 contém "Ignorado" 
-dfpns19 |> count(J002) # Não há registros com valor "Ignorado"
+# levels(dfpns13$J002)
+# levels(dfpns19$J002) # dados de 2019 contém "Ignorado" 
+# dfpns19 |> count(J002) # Não há registros com valor "Ignorado"
 
 # J011 / J01101 - Realizaou consulta médica nos últimos 12 meses
-levels(dfpns13$J011)   # escala diferente entre 2013 e 2019
-levels(dfpns19$J01101) # escala diferente entre 2013 e 2019
+# levels(dfpns13$J011)   # escala diferente entre 2013 e 2019
+# levels(dfpns19$J01101) # escala diferente entre 2013 e 2019
 svy13 <- 
   svy13 |> 
   srvyr::mutate(
@@ -139,17 +139,17 @@ svy19 <-
     J011 = factor(J011, levels = c("Não", "Sim")))
 
 # Sexo
-levels(dfpns13$C006) #  "Masculino" "Feminino" 
-levels(dfpns19$C006) #  "Homem"  "Mulher"
+# levels(dfpns13$C006) #  "Masculino" "Feminino" 
+# levels(dfpns19$C006) #  "Homem"  "Mulher"
 
 # UF
-levels(dfpns13$V0001)
-levels(dfpns19$V0001)
+# levels(dfpns13$V0001)
+# levels(dfpns19$V0001)
 
 # I001 - Possui plano de saúde
-levels(dfpns13$I001)
-levels(dfpns19$I00101)
-dfpns19 |> count(I00101) 
+# levels(dfpns13$I001)
+# levels(dfpns19$I00101)
+# dfpns19 |> count(I00101) 
 svy13 <- 
   svy13 |> 
   srvyr::mutate(I001 = relevel(I001, ref = "Sim"))
@@ -163,8 +163,8 @@ svy19 <-
 
 # VDD004A - Grau de instrução
 ## Agrupa Grau de Instrução ---- 
-levels(dfpns13$VDD004A)
-levels(dfpns19$VDD004A)
+# levels(dfpns13$VDD004A)
+# levels(dfpns19$VDD004A)
 svy13 <- 
   svy13 |>  
   srvyr::mutate(instrucao = case_when(
