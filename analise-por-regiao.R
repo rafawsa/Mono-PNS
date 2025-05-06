@@ -17,12 +17,9 @@ rm(pns19)
 rm(dfpns13)
 rm(dfpns19)
 
-source("razao-prevalencia-bruta.R")
-source("razao-prevalencia-ajustada.R")
-
-dfpns19  <- as_tibble(svy19)
+svy19  <- as_tibble(svy19)
 regioes <- 
-  dfpns19 |> 
+  svy19 |> 
   distinct(regiao) |> 
   pull(regiao) |> 
   as.character()
@@ -54,7 +51,7 @@ quarto_render(input = "analise-regiao-report.qmd",
 por_regiao <- 
   tibble(
     intput = "analise-regiao-report.qmd",
-    output = str_glue("analise-regiao-{regioes}.html") ,
+    output_file = str_glue("analise-regiao-{regioes}.html") ,
     execute_params = map(regioes, ~ list(regiao = .))
 )
 
@@ -62,3 +59,22 @@ por_regiao |> View()
 
 pwalk(por_regiao, quarto_render)
 
+
+library(quarto)
+library(tidyverse)
+library(gapminder)
+
+countries <-
+  gapminder |>
+  distinct(country) |>
+  pull(country) |>
+  as.character()
+
+reports <-
+  tibble(
+    input = "analise-regiao-report.qmd",
+    output_file = str_glue("{regioes}.html"),
+    execute_params = map(regioes, ~ list(regiao = .))
+  )
+
+pwalk(reports, quarto_render)
