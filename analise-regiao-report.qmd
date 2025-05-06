@@ -2,7 +2,10 @@
 title: "analise-regiao"
 author: "Rafa"
 format: html
-editor: visual
+execute: 
+  echo: false
+  warning: false
+  message: false
 params:
   regiao: "Norte"
 ---
@@ -400,7 +403,7 @@ not_dcnt19 <-
 
 ```
 
-```{r}
+```{r label="cenário 5 a"}
 #| warning: false
 # RP Bruta:
 c5_pns13 <- 
@@ -420,7 +423,7 @@ c5_pns19 <-
 
 ```
 
-```{r}
+```{r label="cenário 5 b"}
 #| warning: false
 # RP Ajustada:
 c5_pns13 <- 
@@ -449,7 +452,7 @@ c5_pns19 <-
 
 #### Resultados - Região `r params$regiao`.
 
-```{r}
+```{r label="cenário 5 c"}
 #| warning: false
 # Resultados:
 

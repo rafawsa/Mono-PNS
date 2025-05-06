@@ -60,18 +60,30 @@ Vamos calcular a prevalência bruta da população com DCNT em relação à popu
 
 -   J011 - Consulta médica nos últimos 12 meses".
 
-#### Cenário 12 - Razão de prevalência do uso de serviços de saúde para a Exposição possuir ou não plano de saúde privado
+#### Cenário 12 - Razão de prevalência do uso de serviços de saúde para população SEM Plano de Saúde Privado em relação à população COM Plano de Saúde Privado
 
 ```{r}
 #| warning: false
 
-c12_pns13_plano <- 
+c12_pns13 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011")  # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"),  
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C12 - RP pop sem plano privado em rel a pop com plano privado"),
+    pns = c("PNS 2013")
   )
-c12_pns19_plano <- 
+c12_pns19 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011")  # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"),  
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C12 - RP pop sem plano privado em rel a pop com plano privado"),
+    pns = c("PNS 2019")
   )
 
 ```
@@ -80,15 +92,15 @@ c12_pns19_plano <-
 #| warning: false
 
 # RP Bruta:
-c12_pns13_plano <- 
-  c12_pns13_plano |> 
+c12_pns13 <- 
+  c12_pns13|> 
   mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(svy13, "I001", .x,
                                                   exp_pos = "Não", exp_neg = "Sim",
                                                   des_pos = "Sim", des_neg = "Não"))) |> 
   unnest(rp_bruta) 
 
-c12_pns19_plano <- 
-  c12_pns19_plano |> 
+c12_pns19 <- 
+  c12_pns19 |> 
   mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(svy19, "I00101", .x,
                                                   exp_pos = "Não", exp_neg = "Sim",
                                                   des_pos = "Sim", des_neg = "Não"))) |> 
@@ -99,15 +111,15 @@ c12_pns19_plano <-
 ```{r}
 #| warning: false
 # RP Ajustada
-c12_pns13_plano <- 
-  c12_pns13_plano |> 
+c12_pns13 <- 
+  c12_pns13 |> 
   mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(svy13, "I001", .x,
                                                                 exp_pos = "Não", exp_neg = "Sim",
                                                                 des_pos = "Sim", des_neg = "Não"))) |> 
   unnest(data)
 
-c12_pns19_plano <- 
-  c12_pns19_plano |> 
+c12_pns19 <- 
+  c12_pns19 |> 
   mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(svy19, "I00101", .x,
                                                                 exp_pos = "Não", exp_neg = "Sim",
                                                                 des_pos = "Sim", des_neg = "Não"))) |> 
@@ -120,26 +132,38 @@ c12_pns19_plano <-
 #| warning: false
 # Resultados:
 
-# Cenário 12 - Razão de prevalência do uso de serviços de saúde para a Exposição possuir ou não plano de saúde privado - PNS 2013
-(c12_pns13_plano)
+# Cenário 12 - Razão de prevalência do uso de serviços de saúde da população SEM Plano de Saúde Privado em relação à população COM Plano de Saúde Privado - PNS 2013
+(c12_pns13)
 
-# Cenário 12 - Razão de prevalência do uso de serviços de saúde para a Exposição possuir ou não plano de saúde privado - PNS 2019
-(c12_pns19_plano)
+# Cenário 12 - Razão de prevalência do uso de serviços de saúde da população SEM Plano de Saúde Privado em relação à população COM Plano de Saúde Privado - PNS 2019
+(c12_pns19)
 
 ```
 
-### Cenário 13 - Razão de prevalência do uso de serviços de saúde para a Exposição possuir ou não Plano de Saúde Privado para a população portadora de DCNT
+### Cenário 13 - Razão de prevalência do uso de serviços de saúde da população portadora de DCNT SEM Plano de Saúde Privado em relação a população portadora de DCNT COM Plano de Saúde Privado
 
 ```{r}
 #| warning: false
 
-c13_pns13_dcnt <- 
+c13_pns13 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"),  
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C13 - RP pop port DCNT sem plano privado em rel a pop port de DCNT com plano privado"),
+    pns = c("PNS 2013")
   )
-c13_pns19_dcnt <- 
+c13_pns19 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"),  
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C13 - RP pop port DCNT sem plano privado em rel a pop port de DCNT com plano privado"),
+    pns = c("PNS 2019")
   )
 
 ```
@@ -148,11 +172,11 @@ c13_pns19_dcnt <-
 #| warning: false
 # Dados:
 
-c13_svy13_dcnt <- 
+c13_svy13 <- 
   svy13 |> 
     srvyr::filter(J007 == "Sim") 
 
-c13_svy19_dcnt <- 
+c13_svy19 <- 
   svy19 |> 
     srvyr::filter(J007 == "Sim") 
 
@@ -161,16 +185,16 @@ c13_svy19_dcnt <-
 ```{r}
 #| warning: false
 # RP Bruta:
-c13_pns13_dcnt <- 
-  c13_pns13_dcnt |> 
-  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c13_svy13_dcnt, "I001", .,
+c13_pns13 <- 
+  c13_pns13 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c13_svy13, "I001", .,
                                                   exp_pos = "Não", exp_neg = "Sim",
                                                   des_pos = "Sim", des_neg = "Não"))) |>  
   unnest(rp_bruta) 
 
-c13_pns19_dcnt <- 
-  c13_pns19_dcnt |> 
-  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c13_svy19_dcnt, "I00101", .,
+c13_pns19 <- 
+  c13_pns19 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c13_svy19, "I00101", .,
                                                   exp_pos = "Não", exp_neg = "Sim",
                                                   des_pos = "Sim", des_neg = "Não"))) |>
   unnest(rp_bruta) 
@@ -181,17 +205,17 @@ c13_pns19_dcnt <-
 ```{r}
 #| warning: false
 # RP Ajustada:
-c13_pns13_dcnt <- 
-  c13_pns13_dcnt |> 
-  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c13_svy13_dcnt, 
+c13_pns13 <- 
+  c13_pns13 |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c13_svy13, 
                                                                 "I001",.,
                                                   exp_pos = "Não", exp_neg = "Sim",
                                                   des_pos = "Sim", des_neg = "Não"))) |>
   unnest(data)
 
-c13_pns19_dcnt <- 
-  c13_pns19_dcnt |> 
-  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c13_svy19_dcnt, 
+c13_pns19 <- 
+  c13_pns19 |> 
+  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c13_svy19, 
                                                                 "I00101",.,
                                                   exp_pos = "Não", exp_neg = "Sim",
                                                   des_pos = "Sim", des_neg = "Não"))) |>
@@ -203,26 +227,39 @@ c13_pns19_dcnt <-
 #| warning: false
 # Resultados:
 
-# Cenário 13 - Razão de prevalência do uso de serviços de saúde para a Exposição possuir ou não Plano de Saúde Privado para a população portadora de DCNT - PNS 2013
-(c13_pns13_dcnt)
+# Cenário 13 - Razão de prevalência do uso de serviços de saúde para a população sem DCNT e portadora de plano de saúde em relação a população com DCNT com plano de saúde - PNS 2013
+(c13_pns13)
 
-# Cenário 13 - Razão de prevalência do uso de serviços de saúde para a Exposição possuir ou não Plano de Saúde Privado para a população portadora de DCNT - PNS 2019
-(c13_pns19_dcnt)
+# Cenário 13 - Razão de prevalência do uso de serviços de saúde para a população sem DCNT e portadora de plano de saúde em relação a população com DCNT com plano de saúde - PNS 2019
+(c13_pns19)
 
 ```
 
-### Cenário 14 - Razão de prevalência do uso de serviços de saúde para a Exposição de possuir ou não plano de saúde privado para a população Não portadora de DCNT
+### Cenário 14 - Razão de prevalência do uso de serviços de saúde da população não portadora de DCNT sem plano de saúde em relação à população não portadora de DCNT com plano de saúde.
 
 ```{r}
 #| warning: false
 
-c14_pns13_no_dcnt <- 
+c14_pns13 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"),  
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C14 - RP pop port DCNT sem plano privado em rel a pop port de DCNT com plano privado"),
+    pns = c("PNS 2013")
   )
-c14_pns19_no_dcnt <- 
+
+c14_pns19 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"),  
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C14 - RP pop port DCNT sem plano privado em rel a pop port de DCNT com plano privado"),
+    pns = c("PNS 2019")
   )
 
 ```
@@ -230,11 +267,11 @@ c14_pns19_no_dcnt <-
 ```{r}
 #| warning: false
 
-c14_svy13_no_dcnt <- 
+c14_svy13 <- 
   svy13 |> 
     srvyr::filter(J007 == "Não")
 
-c14_svy19_no_dcnt <- 
+c14_svy19 <- 
   svy19 |> 
     srvyr::filter(J007 == "Não") 
 
@@ -243,16 +280,16 @@ c14_svy19_no_dcnt <-
 ```{r}
 #| warning: false
 # RP Bruta:
-c14_pns13_no_dcnt <- 
-  c14_pns13_no_dcnt |> 
-  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c14_svy13_no_dcnt, "I001", .,
+c14_pns13 <- 
+  c14_pns13 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c14_svy13, "I001", .,
                                                   exp_pos = "Não", exp_neg = "Sim",
                                                   des_pos = "Sim", des_neg = "Não"))) |>
   unnest(rp_bruta) 
 
-c14_pns19_no_dcnt <- 
-  c14_pns19_no_dcnt |> 
-  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c14_svy19_no_dcnt, "I00101", .,
+c14_pns19 <- 
+  c14_pns19 |> 
+  mutate(rp_bruta = map(desfecho, ~ calc_rp_bruta(c14_svy19, "I00101", .,
                                                   exp_pos = "Não", exp_neg = "Sim",
                                                   des_pos = "Sim", des_neg = "Não"))) |> 
   unnest(rp_bruta) 
@@ -262,20 +299,40 @@ c14_pns19_no_dcnt <-
 ```{r}
 #| warning: false
 # RP Ajustada:
-c14_pns13_no_dcnt <- 
-  c14_pns13_no_dcnt |> 
-  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c14_svy13_no_dcnt, 
-                                                                "I001",.,
-                                                  exp_pos = "Não", exp_neg = "Sim",
-                                                  des_pos = "Sim", des_neg = "Não"))) |>
+c14_pns13 <-
+  c14_pns13 |>
+  mutate(
+    data = map(
+      desfecho,
+      ~ calc_razao_prevalencia_ajustada(
+        c14_svy13,
+        "I001",
+        .,
+        exp_pos = "Não",
+        exp_neg = "Sim",
+        des_pos = "Sim",
+        des_neg = "Não"
+      )
+    )
+  ) |>
   unnest(data)
 
-c14_pns19_no_dcnt <- 
-  c14_pns19_no_dcnt |> 
-  mutate(data = map(desfecho, ~ calc_razao_prevalencia_ajustada(c14_svy19_no_dcnt, 
-                                                                "I00101",.,
-                                                  exp_pos = "Não", exp_neg = "Sim",
-                                                  des_pos = "Sim", des_neg = "Não"))) |>
+c14_pns19 <-
+  c14_pns19 |>
+  mutate(
+    data = map(
+      desfecho,
+      ~ calc_razao_prevalencia_ajustada(
+        c14_svy19,
+        "I00101",
+        .,
+        exp_pos = "Não",
+        exp_neg = "Sim",
+        des_pos = "Sim",
+        des_neg = "Não"
+      )
+    )
+  ) |>
   unnest(data)
 
 ```
@@ -285,9 +342,108 @@ c14_pns19_no_dcnt <-
 # Resultados:
 
 # Cenário 14 - Razão de prevalência do uso de serviços de saúde para a Exposição de possuir ou não plano de saúde privado para a população Não portadora de DCNT - PNS 2013
-(c14_pns13_no_dcnt)
+(c14_pns13)
 
 # Cenário 14 - Razão de prevalência do uso de serviços de saúde para a Exposição de possuir ou não plano de saúde privado para a população Não portadora de DCNT - PNS 2019
-(c14_pns19_no_dcnt)
+(c14_pns19)
 
+```
+
+# Combinação dos Dados
+
+```{r}
+geral <-
+  c12_pns13 |> 
+  rbind(c12_pns19) |> 
+  rbind(c13_pns13) |> 
+  rbind(c13_pns19) |> 
+  rbind(c14_pns13) |> 
+  rbind(c14_pns19) |> 
+  mutate(desfecho = factor(desfecho, levels = c("J014", "J037", "J002", "J011")),
+         cenario = factor(`cenário`),
+         pns = factor(pns))
+
+
+```
+
+J014
+
+```{r}
+dfj014 <- 
+  geral |> 
+  filter(desfecho == "J014")
+
+this_title <- dfj014 |> distinct(descricao) |> pull(descricao) |> as.character()
+
+dfj014 |> 
+  ggplot(aes(x = estimate, y = cenario, group = pns), color = "darkblue") +
+  geom_segment(data = dfj014, aes(x = conf.low, xend = conf.high, y = cenario, yend = cenario), color = "lightblue") +
+  geom_point(color = "darkblue") +
+  scale_y_discrete(limits=rev) +
+  facet_grid(~pns) +
+  theme_minimal() +
+  theme(panel.spacing = unit(2, "lines")) +
+  labs(title = this_title)
+
+```
+
+J037
+
+```{r}
+dfj037 <- 
+  geral |> 
+  filter(desfecho == "J037")
+
+this_title <- dfj037 |> distinct(descricao) |> pull(descricao) |> as.character()
+
+dfj037 |> 
+  ggplot(aes(x = estimate, y = cenario, group = pns), color = "darkblue") +
+  geom_segment(data = dfj037, aes(x = conf.low, xend = conf.high, y = cenario, yend = cenario), color = "lightblue") +
+  geom_point(color = "darkblue") +
+  scale_y_discrete(limits=rev) +
+  facet_grid(~pns) +
+  theme_minimal() +
+  theme(panel.spacing = unit(2, "lines")) +
+  labs(title = this_title)
+```
+
+J002
+
+```{r}
+dfj002 <- 
+  geral |> 
+  filter(desfecho == "J002")
+
+this_title <- dfj002 |> distinct(descricao) |> pull(descricao) |> as.character()
+
+dfj002 |> 
+  ggplot(aes(x = estimate, y = cenario, group = pns), color = "darkblue") +
+  geom_segment(data = dfj002, aes(x = conf.low, xend = conf.high, y = cenario, yend = cenario), color = "lightblue") +
+  geom_point(color = "darkblue") +
+  scale_y_discrete(limits=rev) +
+  facet_grid(~pns) +
+  theme_minimal() +
+  theme(panel.spacing = unit(2, "lines")) +
+  labs(title = this_title)
+
+```
+
+J011
+
+```{r}
+dfj011 <- 
+  geral |> 
+  filter(desfecho == "J011")
+
+this_title <- dfj011 |> distinct(descricao) |> pull(descricao) |> as.character()
+
+dfj011 |> 
+  ggplot(aes(x = estimate, y = cenario, group = pns), color = "darkblue") +
+  geom_segment(data = dfj011, aes(x = conf.low, xend = conf.high, y = cenario, yend = cenario), color = "lightblue") +
+  geom_point(color = "darkblue") +
+  scale_y_discrete(limits=rev) +
+  facet_grid(~pns) +
+  theme_minimal() +
+  theme(panel.spacing = unit(2, "lines")) +
+  labs(title = this_title)
 ```

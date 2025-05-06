@@ -35,9 +35,6 @@ Para acessar os dados da PNS usaremos as funções do pacote PNSIBGE:
 source("read-pns-data.R")
 rm(var_pns_2013)
 rm(var_pns_2019)
-rm(dfpns13)
-rm(dfpns19)
-
 
 ```
 
@@ -72,12 +69,33 @@ Vamos calcular a prevalência bruta da população com DCNT em relação à popu
 
 c1_pns13 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011")  # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"),  
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C1 - RP port DCNT em rel a não port DCNT"),
+    pns = c("PNS 2013")
   )
 c1_pns19 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011")  # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"),  
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C1 - RP port DCNT em rel a não port DCNT"),
+    pns = c("PNS 2019")
   )
+
+```
+
+```{r}
+# Data:
+
+# usaremos: 
+# svy13 e 
+# svy19
 
 ```
 
@@ -120,6 +138,7 @@ c1_pns19 <-
 # Cenário 1:  Razão de prevalência do uso de serviços de saúde da população portadora em relação à população não portadora de DCNT - PNS 2019.
 (c1_pns19)
 
+
 ```
 
 ### Cenário 2 - Razão de prevalência do uso de serviços de saúde da população feminina portadora de DCNT em relação à população feminina não portadora de DCNT.
@@ -128,11 +147,23 @@ c1_pns19 <-
 #| warning: false
 c2_pns13 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"),  
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C2 - RP pop fem port DCNT em rel a pop fem não port de DCNT"),
+    pns = c("PNS 2013")
   )
 c2_pns19 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"), 
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C2 - RP pop fem port DCNT em rel a pop fem não port de DCNT"),
+    pns = c("PNS 2019")
   )
 
 ```
@@ -140,11 +171,12 @@ c2_pns19 <-
 ```{r}
 #| warning: false
 # Data:
-pop_fem13 <- 
-  svy13 |> 
+pop_fem13 <-
+  svy13 |>
   filter(C006 == "Feminino")
-pop_fem19 <- 
-  svy19 |> 
+
+pop_fem19 <-
+  svy19 |>
   filter(C006 == "Mulher")
 
 ```
@@ -198,11 +230,23 @@ c2_pns19 <-
 #| warning: false
 c3_pns13 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"), 
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C3 - RP pop masc port DCNT em rel a pop masc não port de DCNT"),
+    pns = c("PNS 2013")
   )
 c3_pns19 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"), 
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C3 - RP pop masc port DCNT em rel a pop masc não port de DCNT"),
+    pns = c("PNS 2019")
   )
 
 
@@ -268,11 +312,23 @@ c3_pns19 <-
 ```{r}
 c4_pns13 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"), 
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C4 - RP pop fem port DCNT em rel a pop masc port de DCNT"),
+    pns = c("PNS 2013")
   )
 c4_pns19 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"), 
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C4 - RP pop fem port DCNT em rel a pop masc port de DCNT"),
+    pns = c("PNS 2019")
   )
 
 ```
@@ -351,11 +407,23 @@ c4_pns19 <-
 #| warning: false
 c5_pns13 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"), 
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C5 - RP pop fem não port DCNT em rel a pop masc não port de DCNT"),
+    pns = c("PNS 2013")
   )
 c5_pns19 <- 
   tibble(
-    desfecho = c("J014", "J037", "J002", "J011"),   # variáveis investigadas
+    desfecho = c("J014", "J037", "J002", "J011"), 
+    descricao = c("J014 - Uso de serviços de saúde nas duas últimas semanas",
+                  "J037 - Internação nos últimos 12 meses",
+                  "J002 - Deixar de realizar atividades nas duas últimas semanas por motivo de saúde",
+                  "J011 - Consulta médica nos últimos 12 meses"),
+    cenário = c("C5 - RP pop fem não port DCNT em rel a pop masc não port de DCNT"),
+    pns = c("PNS 2019")
   )
 
 
@@ -430,4 +498,105 @@ c5_pns19 <-
 # Cenário 5 - Razão de prevalência do uso de serviços de saúde, considerando a população feminina em relação à masculina para o subgrupo da população não portadora de DCNT. PNS 2019.
 (c5_pns19)
 
+```
+
+# Combinação dos Dados
+
+```{r}
+geral <-
+  c1_pns13 |> 
+  rbind(c1_pns19) |> 
+  rbind(c2_pns13) |> 
+  rbind(c2_pns19) |> 
+  rbind(c3_pns13) |> 
+  rbind(c3_pns19) |> 
+  rbind(c4_pns13) |> 
+  rbind(c4_pns19) |> 
+  rbind(c5_pns13) |> 
+  rbind(c5_pns19) |> 
+  mutate(desfecho = factor(desfecho, levels = c("J014", "J037", "J002", "J011")),
+         cenario = factor(`cenário`),
+         pns = factor(pns))
+
+
+```
+
+J014
+
+```{r}
+dfj014 <- 
+  geral |> 
+  filter(desfecho == "J014")
+
+this_title <- dfj014 |> distinct(descricao) |> pull(descricao) |> as.character()
+
+dfj014 |> 
+  ggplot(aes(x = estimate, y = cenario, group = pns), color = "darkblue") +
+  geom_segment(data = dfj014, aes(x = conf.low, xend = conf.high, y = cenario, yend = cenario), color = "lightblue") +
+  geom_point(color = "darkblue") +
+  scale_y_discrete(limits=rev) +
+  facet_grid(~pns) +
+  theme_minimal() +
+  theme(panel.spacing = unit(2, "lines")) +
+  labs(title = this_title)
+```
+
+J037
+
+```{r}
+dfj037 <- 
+  geral |> 
+  filter(desfecho == "J037")
+
+this_title <- dfj037 |> distinct(descricao) |> pull(descricao) |> as.character()
+
+dfj037 |> 
+  ggplot(aes(x = estimate, y = cenario, group = pns), color = "darkblue") +
+  geom_segment(data = dfj037, aes(x = conf.low, xend = conf.high, y = cenario, yend = cenario), color = "lightblue") +
+  geom_point(color = "darkblue") +
+  scale_y_discrete(limits=rev) +
+  facet_grid(~pns) +
+  theme_minimal() +
+  theme(panel.spacing = unit(2, "lines")) +
+  labs(title = this_title)
+```
+
+J002
+
+```{r}
+dfj002 <- 
+  geral |> 
+  filter(desfecho == "J002")
+
+this_title <- dfj002 |> distinct(descricao) |> pull(descricao) |> as.character()
+
+dfj002 |> 
+  ggplot(aes(x = estimate, y = cenario, group = pns), color = "darkblue") +
+  geom_segment(data = dfj002, aes(x = conf.low, xend = conf.high, y = cenario, yend = cenario), color = "lightblue") +
+  geom_point(color = "darkblue") +
+  scale_y_discrete(limits=rev) +
+  facet_grid(~pns) +
+  theme_minimal() +
+  theme(panel.spacing = unit(2, "lines")) +
+  labs(title = this_title)
+```
+
+J011
+
+```{r}
+dfj011 <- 
+  geral |> 
+  filter(desfecho == "J011")
+
+this_title <- dfj011 |> distinct(descricao) |> pull(descricao) |> as.character()
+
+dfj011 |> 
+  ggplot(aes(x = estimate, y = cenario, group = pns), color = "darkblue") +
+  geom_segment(data = dfj011, aes(x = conf.low, xend = conf.high, y = cenario, yend = cenario), color = "lightblue") +
+  geom_point(color = "darkblue") +
+  scale_y_discrete(limits=rev) +
+  facet_grid(~pns) +
+  theme_minimal() +
+  theme(panel.spacing = unit(2, "lines")) +
+  labs(title = this_title)
 ```
